@@ -1,0 +1,26 @@
+00000 L_ocal
+00001 G_lobal
+00002 A_rchive
+00003 Taille Locale
+00004 Taille Globale
+00005 Création/Recherche
+00006 Processus
+00050 Chercher/Créer
+00051 SansNom
+00052 Rien
+00100 Alias
+00101 Locale
+00102 Globale
+00103 Archivée
+00104 Binaire
+00105 Zéro Terminal
+00106 Taille
+00107 _Contenu
+00108 Contenu
+00109 _Nom
+00110 _Editer
+00111 _Importer
+00112 _Exporter
+00113 Edition
+00200 Importer de :
+00201 Exporter vers :

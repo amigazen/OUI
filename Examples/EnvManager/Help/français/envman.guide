@@ -1,0 +1,423 @@
+@DATABASE "EnvMan.guide"
+@AUTHOR "Dominique Lorre"
+@(C) ", Copyright © 1996 Dominique Lorre, Tous Droits Reservés"
+@$VER:  1.1 (28.7.97)
+@SMARTWRAP
+@MACRO style1 "@{JCENTER}@{APEN 3}"
+@MACRO style2 "@{JLEFT}@{APEN 1}@{LINDENT 4}"
+@MACRO style3 "@{LINDENT 8}"
+@MACRO outline "@{APEN 3}$1@{APEN 1}"
+@FONT Diamond.font 12
+@NODE MAIN "EnvMan : un gestionnaire d'environnement"
+@TITLE "EnvMan : Un gestionnaire d'environnement"
+@{style1}
+Bienvenue dans l'aide en ligne d'EnvMan.
+@{LINE}ATTENTION: Si vous n'êtes pas un utilisateur averti de l'AmigaDOS :
+@{LINE}N'ESSAYEZ MEME PAS CETTE APPLICATION
+@{LINE}L'UTILISATION INCORRECTE d'EnvMan PEUT GRAVEMENT ENDOMMAGER LES REGLAGES DE VOS APPLICATIONS
+@{LINE}Vous pouvez choisir les sujets suivants.
+@{PAR}@{LINE}
+
+@{style2}
+@{BODY}
+@{TAB}@{"Introduction" LINK Intro}@{TAB}@{TAB}Qu'est-ce qu'EnvMan ?
+@{LINE}
+@{TAB}@{"Droits de reproduction" LINK Copyright}@{TAB}Pour la distribution
+@{LINE}
+@{TAB}@{"Utiliser EnvMan" LINK Using}@{TAB}@{TAB}Comment s'en servir it ?
+@{LINE}
+@{TAB}@{"Installation" LINK Installation}@{TAB}@{TAB}Comment l'installer ?
+@{LINE}
+@{TAB}@{"Comment Faire" LINK HowTo}@{TAB}@{TAB}Vous le voulez ? Vous l'aurez ;)
+@{LINE}
+@{TAB}@{"Dépannage" LINK Troubles}@{TAB}@{TAB}Caractéristiques non documentées
+@{LINE}
+@{TAB}@{"Le Futur" LINK Future}@{TAB}@{TAB}@{TAB}Faire plus gros et plus complexe
+@{LINE}
+@{TAB}@{"L'Auteur" LINK Author}@{TAB}@{TAB}@{TAB}Si vous voulez me connaître
+@{LINE}
+@{TAB}@{"Localisation" LINK Translate}@{TAB}@{TAB}Comment traduire EnvMan
+@{LINE}
+@{TAB}@{"Historique" LINK History}@{TAB}@{TAB}Les Modifications
+@{LINE}
+@ENDNODE
+
+@NODE Intro "Introduction"
+@{style2}
+Pendant très longtemps, je ne me souciais pas de savoir ce qui se trouvait
+dans les répertoires ENV: et ENVARC: de mon Amiga et j'ai laissé ceux-ci
+grossir de plus en plus jusqu'au jour ou je me suis rendu compte que
+mon système contenait un GRAND nombre de variables d'environnement, même
+pour des applications que j'avais désinstallé depuis longtemps.
+@{PAR}@{LINE}
+Alors j'ai réalisé que j'avais perdu le contrôle d'une partie vraiment
+importante du système qui est son environnment.
+@{PAR}@{LINE}
+Premièrement, je pense que l'environnement est trop utilisé par les
+applications. Parce que les types d'outils des icônes sont une alternative
+intelligente car si vous lancez un programme avec un icône de projet, il
+utilisera les options spécifiées dans cet icône et non celles qu'il contient
+dans son propre icône.
+Ainsi vous pouvez avoir beaucoup d'options différentes pour le même
+programme, que vous choisissez par un icône de projet. Je pense simplement
+que les variables d'environnement devraient être réservées au cas où plus d'une
+application les utilise, ce qui je crois était leur destination initiale.
+@{PAR}@{LINE}
+En deuxième lieu, il arrive souvent que les varaibles d'environnement soient
+mal utilisées par les applications. Ceci parce que ces variables sont de
+trois types : locales, globales, et archivée. Les variables locales sont
+utilisées par quelques programmes pour leurs options et cela est réellement
+un problème puisque ces variables disparaissent avec le processus qui les avait
+créées. L'unique intérêt des variables locales est pour le réglage de valeurs
+temporaires telles que le SET ECHO ON du Shell.
+@{PAR}@{LINE}
+Le troisième point qui me gênait était que si vous créez une variable
+d'environnement, vous n'avez pas de manière simple pour la modifier.
+Par exemple pour la faire passer dans ENVARC:.
+@{PAR}@{LINE}
+Ainsi, j'ai défini ce que Envman devait être :
+@{style3}
+@{PAR}@{LINE}
+· Puisque certains programmes activent des options qui disparaissent à la réinitialisation
+ou pire, à la fin de leur processus, il devrait être simple avec EnvMan
+de pouvoir les archiver ainsi je pourrais configurer mon application une
+seule fois et je ne m'en soucierais plus après cela.
+@{PAR}@{LINE}
+· Il devra, bien sûr me montrer le contenu de tout l'environnement et
+combien de place celui-ci prend en mémoire.
+@{PAR}@{LINE}
+· Il devra être facile avec EnvMan de créer, chercher ou supprimer n'importe
+quelle variable d'environnement ainsi que faire la promotion d'une variable
+locale vers les répertoires des variables globales et archivées
+(sous CLI seulement). Une variable locale ne devrait pas être effaçable puisque
+cela pourrait gêner le système. J'ai aussi considéré que la capture des
+variables locales d'autres processus ne serait pas très amical envers le système.
+@{PAR}@{LINE}
+· Les variables d'environnement devraient être modifiables, si cela se peut.
+Quelques unes sont seulement des chaînes de caractères et ne posent pas
+de problème mais d'autres sont des fichiers textes ou même binaires comme
+les fichiers IFF ILBM. Les trois méthodes sont 1) Un gadget de texte,
+2) la possibilité d'utiliser un éditeur de textes et 3) une caractéristique
+d'Import/Export. Notez bien que l'édition de texte se fait au moyen de
+léditeur C:Ed par défaut et sinon par le contenu de la variable d'environnement
+EDITOR si elle est définie. EDITOR est également utilisée par le programme
+More et quelques autres utilitaires. La définition de la variable EDITOR
+avec le chemin de votre éditeur de textes favori est très utile et ne consomme
+que peu d'octets de votre mémoire.
+@{PAR}@{LINE}
+
+@ENDNODE
+@NODE Copyright "Informations Légales"
+@{style1}
+EnvMan, Copyright © 1996 Dominique Lorre, Tous droits réservés
+@{LINE}
+@{style2}
+@{LINE}
+EnvMan est FreeWare, vous pouvez l'utiliser et le distribuer comme vous le voulez.
+@{PAR}@{LINE}
+@{style1}
+Restrictions
+@{PAR}@{LINE}
+@{style2}
+La distribution d'EnvMan dans la disquette d'une revue ou comme élément d'un autre
+produit est soumis à un accord signé de l'auteur. La distribution d'EnvMan
+dans toute collection du domaine publique telle que Aminet est autorisée
+sans accord écrit mais seulement en tant que produit indépendant, non comme
+un extra d'une autre application.
+@{PAR}@{LINE}
+@{style1}
+Conditions de distribution
+@{PAR}@{LINE}
+@{style2}
+La méthode d'archivage (actuellement lha) peut être modifiée à condition que
+le programme de désarchivage soit disponible sur Amiga ou que l'archive soit
+auto-extractable sur tout système Amiga supérieur ou égal au 2.0.
+Le contenu de l'archive doit rester inchangé, vous êtes cependant autorisé
+à ajouter un fichier de votre organisation si vous le désirez ainsi que
+toute traduction des catalogues ou du fichier d'aide (dans ce cas j'aimerai que
+vous me les envoyez afin que je puisse les inclure dans la prochaine version).
+@{PAR}@{LINE}
+@{style1}
+L'AUTEUR DE CE LOGICIEL NE PEUT EN AUCUNE MANIERE ETRE TENU POUR REPONSABLE DE QUELQUE
+DOMMAGE DIRECT OU INDIRECT SUBI PAR VOS DONNEES, CE LOGICIEL EST DIFFUSE
+EN l'ETATA ET EST SUJET A CHANGEMENTS SANS PREAVIS.
+@{PAR}@{LINE}
+@ENDNODE
+@NODE Using "Utiliser EnvMan"
+@{style2}
+L'Utilisation d'EnvMan est très simple. Vous le lancez soit du Shell ou du
+Workbench. Aucune option n'a été définie puisque je n'en ai pas trouvé qui soit
+intéressante à implémenter.
+@{PAR}@{LINE}
+Si vous lancez EnvMan à partir du Shell, vous trouverez habituellement plus
+d'informations puisque le Shell crée des variables locales et des alias supplémentaires,
+mais cela n'est pas nécessairement vrai, surtout si votre Shell a été lancé sans
+le fichier d'initialisation Shell-Startup. Quelques variables comme RC,
+process et Result2 sont des variables système et vous ne devriez pas essayer de
+faire la promotion de ces variables car cela risquerait de semer le trouble
+dans les programmes du Shell. C'est la raison pour laquelle j'ai désactivé toute
+modification ou suppression des variables locales.
+@{PAR}@{LINE}
+Si EnvMan prend BEAUCOUP de temps pour afficher sa fenêtre, cela signifie que
+vous avez une ENORME taille d'environnement (200 Ko n'est pas de la science-fiction !)
+et qu'un petit nettoyage de printemps pourrait vous aider à gagner plus de
+mémoire pour vos applications, plus de place dans votre partition SYS: et
+aussi avoir un temps de démarrage plus court puisque l'environnement est
+transféré à chaque redémarrage d'ENVARC: vers ENV:...
+@{PAR}@{LINE}
+Ainsi, quand EnvMan aura vérifié tout votre environnement, il ouvrira une
+fenêtre avec trois listes : une pour les variables locales, une pour les
+globales et une dernière pour les archives. Un bouton de création/recherche
+est également présent.
+@{PAR}@{LINE}
+Dans ces listes, toutes les variables d'environnement sont affichées dans l'ordre
+alphabétique avec leur chemin complet. Je n'ai pas implémenté un affichage basé sur
+les répertoires car j'ai noté que certaines variables étaient difficiles à trouver
+parcequ'elles pouvaient être cachées sous deux ou tois arborescences de répertoires.
+Il est possible que je change cette façon de voir dans le futur, particulièrement
+si beaucoup d'utilisateurs le demandent avec des raisons concrètes.
+Après les noms de variables, vous trouverez le début de leur contenu et serez
+capable d'identifier leur type (par exemple un fichier IFF commencera par les
+lettres FORM).
+@{PAR}@{LINE}
+Pour créer ou rechercher une variable, cliquez sur le bouton et une
+requête de chaîne apparaîtra. Inscrivez alors dans le gadget le nom de la
+variable et validez deux fois. Si la variable existe, elle sera affichée
+et si non une nouvelle entrée sera crée que vous pourrez éditer.
+@{PAR}@{LINE}
+Pour éditer une variable, cliquez sur la liste et une fenêtre s'ouvrira
+avec les paramètres suivants :
+@{PAR}@{LINE}
+@{outline "Alias"} : cette boite est sélectionnée si la variable est un
+@{"Alias" LINK Alias}.
+Vous ne pouvez pas modifier cet état.
+@{PAR}@{LINE}
+@{outline "Locale"} : cette boîte est sélectionnée si la variable est @{"locale" LINK Local}.
+Vous ne pouvez pas modifier cet état.
+@{PAR}@{LINE}
+@{outline "Globale"} : en sélectionnant cette boîte vous allez promouvoir cette variable
+en @{"Globale" LINK Global} et en la déselectionnant vous allez la supprimer du répertoire
+ENV:.
+@{PAR}@{LINE}
+@{outline "Archivée"} : en sélectionnant cette boîte vous allez promouvoir cette variable
+en @{"Archive" LINK Archived} et en la déselectionnant vous allez la supprimer du répertoire
+ENVARC:.
+@{PAR}@{LINE}
+@{outline "Binaire"} : cette variable est probablement un fichier binaire,
+car EnvMan a détecté des codes de contrôle.
+Vous ne pouvez pas modifier cet état.
+@{PAR}@{LINE}
+@{outline "Zéro Terminal"} : cette variable est une chaîne de caractéres
+avec un caractère NULL à la fin. Cet état ne peut pas être modifié mais la
+variable est éditable via le gadget de texte.
+@{PAR}@{LINE}
+@{outline "Taille"} : La taille de la variable.
+@{PAR}@{LINE}
+@{outline "Nom"} : le nom de la variable. Vous pouvez le modifier si vous
+voulez mais cela n'a pas d'effet dans la version actuelle.
+@{PAR}@{LINE}
+@{outline "Contenu"} : le contenu de la variable sera affiché. Si les conditions
+sont favorables, vous pourrez modifier le contenu dans le gadget de texte.
+Les conditions favorables sont : la variable n'est pas binaire et elle est
+globale ou archivée.
+Remarquez que vous pouvez modifier une variable locale mais cela
+n'aura d'effet seulement si vous activez les boîtes Globale our Archivée
+puisque les variables locales sont en LECTURE SEULE. Cela signifie aussi
+que la partie locale ne sera JAMAIS modifiée.
+@{PAR}@{LINE}
+@{outline "Editer"} : cliquez sur ce bouton pour éditer la variable. L'éditeur
+de texte sera C:Ed ou celui décrit par la variable d'environnement EDITOR.
+@{PAR}@{LINE}
+@{outline "Importer"} : cliquez sur ce bouton pour remplacer le contenu de cette
+variable par le fichier de votre choix.
+@{PAR}@{LINE}
+@{outline "Exporter"} : cliquez sur ce bouton pour effectuer une copier du contenu
+de cette variable dans le fichier de votre choix.
+@{PAR}@{LINE}
+@ENDNODE
+@NODE HowTo "Comment Faire ?"
+@{style2}
+Comment créer une nouvelle variable ?
+@{PAR}@{LINE}
+Vous pouvez créer une nouvelle variable en sélectionnant le bouton Création//Recherche.
+@{PAR}@{LINE}
+Comment éditer une variable ?
+@{PAR}@{LINE}
+En sélectionnant la variable dans la liste où vous l'apercevez.
+@{PAR}@{LINE}
+Comment supprimer une variable ?
+@{PAR}@{LINE}
+Pour la supprimer vous devez d'abord l'éditer puis déselectionner les
+attributs Globale et Archivée.
+@{PAR}@{LINE}
+Comment modifier le contenu d'une variable ?
+@{PAR}@{LINE}
+Si la variable est une chaine de texte, vous pouvez la modifier avec le gadget
+de texte. Les autres possibilités sont les boutons Importer/Exporter et Editer.
+@{PAR}@{LINE}
+Pourquoi ne peut-on pas modifier ou supprimer une variable locale ?
+@{PAR}@{LINE}
+Cela risquerait d'être une source de problèmes pour le système mais
+vous pouvez toujours la passer en Globale ou Archivée et la modifier après.
+@{PAR}@{LINE}
+Les listes sont très longues. Comment trouver une variable rapidement ?
+@{PAR}@{LINE}
+Quand vous sélectionnez le bouton Création/Recherche, une nouvelle
+variable sera crée uniquement si elle n'existe pas encore. Si vous
+indiquez le nom d'une variable existante, celle-ci sera trouvée et
+affichée.
+@{PAR}@{LINE}
+Que signifie [ALIAS] ? Je ne peux pas faire la promotion de ces variables !
+@{PAR}@{LINE}
+Bien sûr, les @{"alias" LINK Alias} sont des variables locales particulières
+qui sont généralement définies dans le fichier S:Shell-Startup.
+Elles permettent de renommer de longues lignes de commandes de façon plus
+courte. Les modifier n'est pas permis puisque cela pourrait être une source
+de problèmes. Si vous désirez néanmoins les modifier vous devrez éditer le
+fichier S:Shell-Startup.
+@{PAR}@{LINE}
+Pourquoi ne puis-je pas éditer une variable fichier ?
+@{PAR}@{LINE}
+EnvMan vérifie si la variable ne contient que du texte. Si ce n'est pas le
+cas, vous pouvez toujours l'exporter dans un fichier, la modifier et l'importer
+après que les modifications ont été effectuées.
+@{PAR}@{LINE}
+Qu'est-ce que OUI ?
+@{PAR}@{LINE}
+Cela signifie "Object User Interface". Il s'agit simplement d'une encapsulation
+de certaines fonctions du système pour le C++.
+@{PAR}@{LINE}
+@ENDNODE
+
+@NODE Troubles "Dépannage"
+Quand je modifie le nom de la variable, rien ne se passe.
+@{PAR}@{LINE}
+C'est exact. Cela ne fonctionne pas encore.
+@{PAR}@{LINE}
+Quand je choisis le bouton Editer, rien ne se passe.
+@{PAR}@{LINE}
+EnvMan cherche un éditeur de fichier qui sera C:Ed ou l'éditeur défini
+par la variable d'environnement EDITOR. Si rien ne se passe, cela signifie
+que soit votre variable EDITOR est incorrecte, soit qu'Ed n'est pas dans le
+répertoire C:.
+@{PAR}@{LINE}
+Les couleurs sont bizarres
+@{PAR}@{LINE}
+L'interface OUI est expérimentale et essaie de définir de noyveaux pinceaux
+pour ses applications tels que VERT, ROUGE, BLANC et NOIR ainsi que quelques
+autres comme la couleur de fond des gadgets. Bien que cela fonctionne mieux
+que les premiers essais, vous pourrez toujours rencontrer quelques problèmes
+avec lesécrans 8 couleurs. Une solution pourrait être de vivre avec puisque
+seuls les gadets de texte ou les boutons peuvent être mal affichés. Une autre
+pourrait être de passer en 4 ou 16 couleurs. Sous le système 2.0 l'application
+utilise les pinceaux du système uniquement donc les utilisateurs pourraient
+rencontrer moins de problèmes. Si ceci vous laisse penser que cette interface
+est sans valeur, je répondra que la possibilité d'afficher Non en noir, Oui en blanc,
+Ok en vert et Annuler en rouge est une caractéristique ergonomique appelée Compatibilité.
+@{PAR}@{LINE}
+@ENDNODE
+@NODE Future "Le futur d'EnvMan"
+Je vais certainement implémenter la possibilité de supprimer des répertoires
+d'environnement.
+@{PAR}@{LINE}
+Je pense également au renommage, à la duplication et toutes ces caractéristiques
+qui rendront EnvMan plus gros et plus difficile à utiliser ;).
+@{PAR}@{LINE}
+C'est tout ce que je peux dire pour le moment mais vous pouvez toujours
+m'envoyer votre avis...
+@ENDNODE
+@NODE Author "Qui l'a fait ?"
+Voici mon adresse :
+@{PAR}@{LINE}
+Dominique Lorre
+@{LINE}
+Le Fabary, BAT C
+@{LINE}
+4, Allée des Peupliers
+@{LINE}
+13100 Aix-en-Provence FRANCE
+@{PAR}@{LINE}
+Je suis un utilisateur de l'Amiga depuis 1985, un développeur depuis
+1987, j'ai été impliqué dans l'édition en France de plusieurs livres
+concernant l'Amiga aux éditions Micro-Application, et j'ai également
+publié des articles sur l'Amiga dans des magazines tels qu'Amiga Revue.
+En 1990, j'ai participé au projet ADC16 qui est une carte opérationnelle
+d'acquisition et restitution 16 bits audio et j'ai écrit les premières versions
+du gestionnaire et du programme d'application. Depuis fin 1992, je m'occupe
+du développement d'un nouveau logiciel musical qui s'appelle Euterpe et qui
+sera bientôt diffusé.
+@{PAR}@{LINE}
+@ENDNODE
+@NODE Installation "Comment installer EnvMan"
+Vous n'avez pas besoin d'installer EnvMan car il fonctionne de façon
+autonome. Vous pouvez cependant installer les catalogues. Le fichier
+oui.catalog devrait être placé dans LOCALE:Catalogs/votre langue/oui.catalog
+où "votre langue" est le nom de votre language. Le fichier envman.catalog
+peut être placé dans le même répertoire que oui.catalog ou dans un répertoire
+Catalogs situé à l'endroit où EnvMan a été copié (i.e. PROGDIR:Catalogs).
+@ENDNODE
+@NODE Translate "Comment traduire EnvMan ?"
+EnvMan construit désormais des fichiers CatComp pour ses catalogues
+@{PAR}@{LINE}
+
+@{PAR}@{LINE}
+Les traductions actuellement disponibles pour l'espagnol, l'allemand et
+l'italien ont été faites à partir d'un dictionnaire et sont certainement pleines
+d'erreurs ! Vous pouvez donc choisir d'en faire d'autres. Pour l'anglais et le
+français cela ne devrait pas être nécessaire.
+@{PAR}@{LINE}
+@ENDNODE
+@NODE Global "Variables Globales"
+Une variable globale est une variable qui est placée dans le répertoire ENV:.
+D'habitude, ce répertoire est RAM:env. Quand une application telle qu'un
+des programmes de preférences crée une nouvelle variable, elle
+la place dans ENV: quand vous sélectionnez le bouton Utiliser, car cela
+signifie : "Utiliser ces réglages pour le moment mais pas de façon permanente".
+A partir du Shell vous pouvez également créer des vraiables globales et les
+lire avec les commandes SetEnv et GetEnv.
+Dans les scripts du Shell, vous pouvez utiliser ces variables en les préfixant
+avec le signe DOLLAR qui est en principe le caractère "$" mais qui peut
+être modifié avec la déclaration .DOL des fichiers scripts.
+@ENDNODE
+@NODE Local "Variables Locales"
+Les variables locales sont crées à partir du Shell ou d'une application
+et sont attachées à un processus. Quand celui-ci s'achève, toutes ses
+variables locales sont supprimées. Quelques unes sont crées par des commandes
+de C: comme Version qui crée KickStart et Workbench et d'autres sont utilisées
+par le Shell lui-même comme RC et Result2. Si une variable locale coexiste
+avec une variable globale de même nom elle sera prioritaire, il est donc
+préférable d'avoir une seule variable globale qu'une variable locale par
+processus. A partir du Shell vous pouvez créer et consulter les variables locales
+avec les commandes Set et Get.
+Dans les scripts du Shell, vous pouvez utiliser ces variables en les préfixant
+avec le signe DOLLAR qui est en principe le caractère "$" mais qui peut
+être modifié avec la déclaration .DOL des fichiers scripts.
+@ENDNODE
+@NODE Alias "Variables Alias"
+Les alias sont des redéfinitions de commandes crées par la commande Alias du Shell.
+Le fichier S:Shell-Startup les définit. EnvMan les reconnait car elles font
+parties des mêmes listes que les variables locales mais se contente de les afficher.
+@ENDNODE
+@NODE Archived "Variables Archivées"
+Une variable archivée est une variable qui est placée dans le répertoire ENVARC:.
+D'habitude, ce répertoire est SYS:Prefs/env-archive. Quand une application
+comme un des programmes de préférences crée une nouvelle variable archivée,
+il la place dans ENVARC: quand vous avez sélectionné le bouton Sauver car
+cela signifie "Utiliser ces réglages pour toujours".
+Cette opération crée également une @{"variable globale" LINK Global}.
+@ENDNODE
+@NODE History "Historique des Modifications"
+Version 1.1 (28.7.97)
+@{PAR}@{LINE}
+Les fichiers de localisation sont désormais compatibles CatComp
+@{LINE}
+EnvMan dispose d'un gadget de Zoom permettant de l'iconifier
+@{LINE}
+EnvMan est désormais compilable avec gcc aussi bien que SASC afin
+de pouvoir produire bientôt une version PowerPC !
+@{LINE}
+Envman utilise maintenant le sélectionneur de fichiers de l'asl.library
+@{LINE}
+L'aide est maintenant accessible en ligne grâce au bouton Aide
+@{LINE}
+@ENDNODE

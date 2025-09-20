@@ -1,0 +1,6 @@
+list > ram:aze PAT=#?.(cc|h) SINCE $lastciENVMAN LFORMAT "rcsdiff %S%S > ram:bre*Nmore ram:bre*N ci -l %S%S"
+execute ram:aze
+day > envarc:lastciENVMAN
+day > env:lastciENVMAN
+
+

@@ -1,0 +1,240 @@
+
+Welcome to the EnvMan documentation.
+You can select the following topics.
+
+
+
+«Introduction»What is EnvMan ?
+
+«Copyright»For the distribution
+
+«Using EnvMan»How to use it ?
+
+«Installation»How to install it ?
+
+«How To»You want it ? You'll got it ;)
+
+«TroubleShooting»The undocumented features
+
+«The Future»How to make it bigger and more complex
+
+«The Author»If you don't know me
+
+«Object User Interface»What is OUI ?
+
+«Localisation»How to get a real catalog
+
+
+
+For a very long time I did'nt bother at any time of what was placed in
+my ENV: and ENVARC: directories and I let the stuff growing bigger and
+bigger until one day I considered the fact that my system was containing a
+LOT of environment variables, even for applications I have desinstalled a
+long time ago.
+
+Then I have realized that I had lost the control of a really important
+part of the system which is the environnement.
+
+First of all, I think that the environnement is too much used by
+applications. Because a really smart alternative are the icon tooltypes.
+Any program can have its options controled by the tooltypes
+and the smart point is that if you launch a program with a project icon, it
+will use the options set in this icon and not those of the tool icon.
+Then you can have a lot of different options for the same program, each
+controlled by a different project icon. In my humble opinion, the environment
+variables should only be used if they are of interest for more than one
+application which I believe they have been designed for.
+
+The second point is that often, the environment variables are misused by
+applications. This is because the variables are of three kinds : local, global
+and archived. The local variables are used by few programs to set their
+options and it is definitely a mistake because these variables only exist
+with the process which created them. The only interest of local variables
+is for setting temporary values such as SET ECHO ON of the shell.
+
+The third point which I was not happy with is that if you create an
+environnement variable, you have no simple way of modifying it. For example
+you can not have it global easily.
+
+Then I have designed what EnvMan should be:
+
+
+· Since some programs set options which disappear at reboot time
+or worse, at the end of their process, it should be easy with EnvMan to
+set those as global so I can configure the application once and don't
+bother about it later.
+
+· It must of course, show me the contents of all the environment and how
+much place it takes in memory.
+
+· It must be easy with EnvMan to create, search or delete any environment
+variable and to make promotion of a local variable to the global or archive
+set (CLI only). The local variable should not be deletable since this can be
+harmful to the system. I have also considered that grabbing local variables
+from other processes would not be system friendly.
+
+· The environment variables should be editable, if this can be done. Some
+are just a text string and it makes no problem but other are text files
+or even binary files such as IFF ILBM. The three methods are 1) A string
+gadget, 2) A file edit feature and 3) An Import/Export feature. Please
+note that the file edition uses C:Ed by default but looks at the environment
+variable EDITOR which is also used by the More program and other utilities.
+Setting the environment variable EDITOR to your favorite text editor is a must
+and don't take a lot of place in memory.
+
+
+
+
+EnvMan, Copyright © 1996 Dominique Lorre, All rights reserved
+
+
+
+EnvMan is FreeWare, you can use it and distribute it like you want.
+
+
+Restrictions
+
+
+Distribution of EnvMan in a magazine cover disk or as part of another
+product is subject to a signed agreement from the author. The distribution
+of EnvMan on any free software collection such as Aminet is allowed without
+a signed agreement but only as an independent product, not as an extra of
+another application.
+
+
+Conditions of distribution
+
+
+The envman archive method (currently lha) can be changed provided that the
+dearchiving program is available on Amiga or the new archive is self auto-extractable
+on any Amiga system greater or equal to 2.0.
+The archive contents must be preserved intact but you are authorized to add
+a simple file belonging to your organisation if you want and are also welcome
+if you add new translations of catalogs or help files (in this case I would prefer
+if you send those directly to me so I could include them in the next release).
+
+
+THE AUTHOR OF THIS PRODUCT CAN NOT IN ANY EVENT BEING HELD RESPONSIBLE
+OF ANY DAMAGE DIRECT OR INDIRECT CAUSED TO YOUR DATAS. THIS PRODUCT IS
+GIVEN AS IS AND IS SUBJECT TO CHANGES WITHOUT NOTIFICATIONS.
+
+
+
+EnvMan usage is very simple. You can launch it either from the Shell or
+the Workbench. There are no options since I didn't find any interesting
+options to implement.
+
+If you launch EnvMan from the Shell, you will find generally more information
+since more local variables and alias will be declared, but this is not
+always true, especially if your Shell has been launched without the
+S:Shell-Startup initialization file. Some variables like RC, process and
+Result2, are systems variables and you should not try to promote such local
+variables, since other Shell programs might find this confusing. This
+is the reason why I have disabled any modification or suppression of local
+variables.
+
+If EnvMan takes a LOT of time to appear, this means that you have a HUGE
+environment size (200 Kbytes is NOT science-fiction !) and that a little
+cleanup might help you gaining more RAM, more space to your SYS: partition
+and also having a faster booting process since the environment is transfered
+at every boot time from ENVARC: to ENV:...
+
+Then, when EnvMan has checked all of your environment, it creates a window
+with three lists one for the local variables, one for the global ones and the
+third list is for the archives. There is also a button for the create/search
+facility. The GUI considerations are discussed under the OUI paragraph.
+
+In the lists, all the environment variables are displayed in the alphabetical
+order with their full path name. I did not implement a directory based display
+since I noticed that some variables are quite hard to search for since they
+can be hidden under two or three directories nodes. However, I can change my
+mind in the future, especially if many users ask for it with good reasons.
+After the variables name, you will find the beginning of their contents and
+will be able to identify their types (for example an IFF file will begin
+with the FORM letters).
+
+To edit a variable, just click on it into the list and a window will open with
+the following settings :
+
+ : the box is checked if the variable is an alias. You can
+not modify this state.
+
+ : the box is checked if the variable is local. This is not modifiable.
+
+ : checking this box promote your variable to Global and unchecking it
+delete the variable from ENV:
+
+ : checking this box promote the variable to Archive and unchecking it
+delete the variable from ENVARC:.
+
+ : the variable is probably a binary file, since EnvMan has detected
+control codes. You cannot modify this state.
+
+ : the variable is a string with a Null character at its end. This
+state may not be modified but the variable is editable via a string gadget.
+
+ : the size of the variable.
+
+ : the name of the variable. You can edit the name if you want but it
+has no effect in this version.
+
+ : the contents of the variable will be displayed. If the conditions
+are good, you will be able to modify the contents inside the string gadget.
+Good conditions are : the variable is not binary and it is global or archived.
+Note that you can modify a local variable but this will have effect only if
+you check the Global or Archived box since local variables are READ-ONLY.
+This also means that the local part will NEVER be modified.
+
+ : click on this button to Edit the variable. The file editor will
+be C:Ed or the EDITOR variable contents.
+
+ : click on this button to replace the contents of this variable
+by a file of your choice.
+
+ : click on this button to make a copy of this variable in a file of
+your choice.
+
+
+
+How to create a new variable ?
+
+You can create a new variable by selecting the button Create/Sarch
+
+How to edit a variable ?
+
+By selecting the variable on the list where it appears
+
+How to delete a variable ?
+
+You can delete a variable by first editing it and setting the Global and
+Archived attributes to off
+
+How can I modify the contents of a variable ?
+
+If the variable is a single text string you can modify it with a string gadget
+other possibilities are Import/Export and Edition.
+
+Why can't I modify or delete a local variable ?
+
+This may be a source of problems to your system but you can still promote
+it to global or archived and modify it later.
+
+The lists are very long, how can I find a variable quickly ?
+
+When you select the create/search button, a new variable will only be
+created if it was not existing already. If you specify the name of an
+existing variable, the variable will be found and displayed.
+
+What does [ALIAS] mean ? I can't have those variables promoted !
+
+Yes, alias are special local variable that are generally declared in
+the S:Shell-Startup file. Alias allow renaming of long command lines to
+a shorter command. Modifying is not allowed since it can be a source of
+troubles. If you want to modify those you will be obliged to edit the
+S:Shell-Startup file.
+
+Why can't I edit a file variable ?
+
+EnvMan checks if a file variable is text only. If not, you can still Export it
+to a file, modify it and Import it after the modifications have been made.
+

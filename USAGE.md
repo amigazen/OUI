@@ -1,6 +1,6 @@
 # OUI Library Usage Guide
 
-This guide explains how to use the OUI (Object User Interface) library to create Amiga applications with C++.
+This guide explains how to use the OUI (Object User Interface) library to create Amiga applications with C++. Based on the EnvManager example application.
 
 ## Table of Contents
 
@@ -11,54 +11,85 @@ This guide explains how to use the OUI (Object User Interface) library to create
 5. [Gadgets and User Interface](#gadgets-and-user-interface)
 6. [Event Handling](#event-handling)
 7. [Localization](#localization)
-8. [Complete Example](#complete-example)
-9. [Compilation](#compilation)
+8. [Advanced Features](#advanced-features)
+9. [Complete Example](#complete-example)
+10. [Compilation](#compilation)
 
 ## Basic Application Structure
 
-Every OUI application follows this basic pattern:
+Every OUI application follows this pattern, as demonstrated in the EnvManager example:
 
 ```cpp
 #include <exec/types.h>
-#include <exec/execbase.h>
-#include <intuition/intuition.h>
-#include <libraries/gadtools.h>
+#include <dos/dos.h>
+#include <dos/dosextens.h>
+#include <graphics/gfxbase.h>
+#include <diskfont/diskfont.h>
+#include <string.h>
+#include <stdio.h>
 
-// OUI includes
-#include "screen.h"
-#include "window.h"
-#include "gadget.h"
+#include <proto/exec.h>
+#include <proto/graphics.h>
+#include <proto/dos.h>
+#include <proto/amigaguide.h>
+#include <mydebug.h>
+#include <compiler.h>
 
-class MyApplication : public window {
-public:
-    MyApplication() : window(100, 100, 400, 300) {
-        // Constructor - set up window parameters
-    }
-    
-    virtual ~MyApplication() {
-        // Destructor - cleanup handled automatically
-    }
-    
-    virtual void open(screen *s) {
-        window::open(s);  // Call parent open method
-        
-        // Add your gadgets and setup here
-        setupGadgets();
-    }
-    
-private:
-    void setupGadgets() {
-        // Create and add gadgets to the window
-    }
-};
+#define NO_CLASS_WINDOW_INLINES
+#include <screen.h>
+#include <locale.h>
+
+// Your application includes
+#include "envdef.h"
+#include "enventry.h"
+#include "envwin.h"
+
+// Global variables for OUI
+screen *ns;
+catalog *ecat;
+
+// Library initialization functions
+void _STI_200_initlibs() {
+    LocaleBase = OpenLibrary((UBYTE *)"locale.library", 0);
+    AmigaGuideBase = OpenLibrary((UBYTE *)"amigaguide.library", 39);
+}
+
+void _STD_200_closelibs() {
+    if (LocaleBase) CloseLibrary(LocaleBase);
+    if (AmigaGuideBase) CloseLibrary(AmigaGuideBase);
+}
+
+extern "C" {
+void _STI_4500_initcat() {
+    ecat = new catalog("myapp.catalog", "english", NULL);
+}
+
+void _STD_4500_closecat() {
+    delete ecat;
+}
+}
 
 int main() {
-    // Initialize OUI memory management
     // Create screen
-    // Create and open window
-    // Run event loop
-    // Cleanup
+    ns = new screen(NULL, "Workbench");
+    if (ns && ns->status) {
+        // Create and open main window
+        MyWindow *app = new MyWindow(10, 10, 500, 120);
+        app->open(ns);
+        if (app->initok) {
+            app->eventloop();
+            app->close();
+        }
+        delete app;
+    }
+    delete ns;
+    return 0;
 }
+
+#if defined( __GNUG__ )
+ADD2INIT(_STI_4500_initcat, -40);
+ADD2EXIT(_STD_4500_closecat,-40);
+#endif
 ```
 
 ## Memory Management
@@ -189,105 +220,126 @@ back();                 // Send to back
 
 ## Gadgets and User Interface
 
-OUI provides many gadget types for building user interfaces:
+OUI provides many gadget types for building user interfaces. The EnvManager example shows practical usage:
 
 ### Gadget List Setup
 ```cpp
 #include "gadgetlist.h"
 
-// Create gadget list (allocate for maximum number of gadgets)
-gadgetlist *gadgets = new gadgetlist(10);  // Max 10 gadgets
+// In your window's open() method
+g = new gadgetlist(this, 10);  // Max 10 gadgets for this window
 
-// Add gadgets to the list
-button *okButton = new button(gadgets, &MyWindow::fok, "OK");
-button *cancelButton = new button(gadgets, &MyWindow::fcancel, "Cancel");
+// Set font for gadgets
+g->setfont(&Tiny);  // or &Normal
+
+// Position gadgets using box() method
+g->box(20, ws->winbarheight+8, g->ltext(local)+8, g->fontheight*3/2);
+new cstring(g, NULL, local, NULL, FALSE, PLACETEXT_IN|NG_HIGHLABEL);
+
+// Update gadgets after creation
+if (initok) g->updategadgets();
 ```
 
 ### Available Gadget Types
 
 #### Buttons
 ```cpp
-#include "gadgets/button.h"
+#include "gadgets/fbutton.h"
 
 // Standard button
-button *btn = new button(gadgets, &MyWindow::buttonHandler, "Button Text");
+new fbutton(g, WFUNC(&MyWindow::buttonHandler), "Button Text", FALSE);
 
 // Default button (highlighted)
-button *defBtn = new button(gadgets, &MyWindow::buttonHandler, "OK", TRUE);
+new fbutton(g, WFUNC(&MyWindow::buttonHandler), "OK", TRUE);
 ```
 
 #### String Gadgets
 ```cpp
 #include "gadgets/string.h"
+#include "gadgets/cstring.h"
 
-// String input
-string *str = new string(gadgets, 100, 20, "Default Text");
+// String input with label
+new cstring(g, NULL, "Label:", NULL, FALSE, PLACETEXT_IN);
+new string(g, NULL, NULL, "Default Text", 50);
+
+// String input without label
+new string(g, WFUNC(&MyWindow::stringHandler), NULL, "Default Text", 50);
 ```
 
 #### Number Gadgets
 ```cpp
-#include "gadgets/number.h"
+#include "gadgets/cnumber.h"
 
-// Number input
-number *num = new number(gadgets, 0, 100, 50);  // min, max, default
+// Number input with label
+new cnumber(g, NULL, "Size:", 50, TRUE, PLACETEXT_LEFT|NG_HIGHLABEL);
 ```
 
 #### Checkboxes
 ```cpp
 #include "gadgets/checkbox.h"
 
-// Checkbox
-checkbox *cb = new checkbox(gadgets, "Checkbox Label", FALSE);
+// Checkbox with label
+new checkbox(g, WFUNC(&MyWindow::checkboxHandler), "Checkbox Label", FALSE, PLACETEXT_LEFT);
+
+// Checkbox without handler (read-only)
+new checkbox(g, NULL, "Read Only", TRUE, PLACETEXT_LEFT, TRUE);
 ```
 
-#### Radio Buttons
+#### List Views
 ```cpp
-#include "gadgets/radio.h"
+#include "gadgets/listview.h"
 
-// Radio button group
-radio *radio1 = new radio(gadgets, "Option 1", TRUE);
-radio *radio2 = new radio(gadgets, "Option 2", FALSE);
+// List view showing data from nlist
+listview *lloc = new listview(g, WFUNC(&MyWindow::listHandler), NULL, NULL, 
+                              myList, 0, 0);
 ```
 
-#### Sliders
+#### Specialized Gadgets
 ```cpp
-#include "gadgets/slider.h"
-
-// Slider
-slider *sl = new slider(gadgets, 0, 100, 50, 200);  // min, max, default, width
-```
-
-#### Cycle Gadgets
-```cpp
-#include "gadgets/cycle.h"
-
-// Cycle gadget (dropdown)
-const char *options[] = {"Option 1", "Option 2", "Option 3", NULL};
-cycle *cyc = new cycle(gadgets, options, 0);
+// Custom string gadget with specific behavior
+cstring *label = new cstring(g, NULL, "Label:", NULL, FALSE, PLACETEXT_IN);
+string *input = new string(g, NULL, NULL, defaultValue, maxLength);
 ```
 
 ### Gadget Event Handling
 ```cpp
 class MyWindow : public window {
 protected:
-    // Override gadget event handlers
-    virtual void fok(gadget *g, unsigned long classe, unsigned short code) {
-        // OK button pressed
-        okflag = TRUE;
-        active = FALSE;
+    // Custom gadget event handlers
+    void flist(gadget *g, ULONG classe, USHORT code) {
+        // List view item selected
+        curenv = (enventry *)myList->get(code);
+        if (curenv) {
+            // Handle selection
+        }
     }
     
-    virtual void fcancel(gadget *g, unsigned long classe, unsigned short code) {
-        // Cancel button pressed
-        okflag = FALSE;
-        active = FALSE;
+    void fnew(gadget *g, ULONG classe, USHORT code) {
+        // Create new item button pressed
+        STRPTR name = StringRequest("Enter Name:", "");
+        if (name) {
+            // Process new item
+            delete name;
+        }
     }
     
-    virtual void fapply(gadget *g, unsigned long classe, unsigned short code) {
-        // Apply button pressed
-        okflag = TRUE;
-        applique = TRUE;
-        active = FALSE;
+    void fhelp(gadget *g, ULONG classe, USHORT code) {
+        // Help button pressed
+        if (AmigaGuideBase && HelpHandle)
+            SendAmigaGuideCmd(HelpHandle, "LINK MAIN", NULL);
+    }
+    
+    // Override keyboard handling
+    virtual void handlevkey(USHORT code) {
+        if (code == 0x0D) {  // Enter
+            g->selectgadget(okid, FALSE);
+        }
+        else if (code == 0x1B) {  // Escape
+            g->selectgadget(cancelid, FALSE);
+        }
+        else {
+            g->parsegadgets(code);
+        }
     }
 };
 ```
@@ -349,117 +401,363 @@ virtual void handlevkey(USHORT code) {
 
 ## Localization
 
-OUI provides built-in localization support:
+OUI provides built-in localization support with catalog system:
 
 ### Setting Up Localization
 ```cpp
 #include "locale.h"
 
-// Create catalog
-catalog *myCatalog = new catalog("MyApp", "english", "francais");
+// Global catalog variable
+catalog *ecat;
 
-// Create localized strings
-lstring okText(myCatalog, "OK", "MSG_OK");
-lstring cancelText(myCatalog, "Cancel", "MSG_CANCEL");
+// Initialize catalog in library init function
+extern "C" {
+void _STI_4500_initcat() {
+    ecat = new catalog("myapp.catalog", "english", NULL);
+}
+
+void _STD_4500_closecat() {
+    delete ecat;
+}
+}
+
+// Define localized strings using macros
+GLOBAL const lstring FAR local NPARMS(ecat, "L_ocal", "MSG_LOCAL_GAD", 0);
+GLOBAL const lstring FAR global LPARMS(ecat, "G_lobal", "MSG_GLOBAL_GAD");
+GLOBAL const lstring FAR archive LPARMS(ecat, "A_rchive", "MSG_ARCHIVE_GAD");
+GLOBAL const lstring FAR newentry LPARMS(ecat, "Create/Search", "MSG_CREATE_AND_SEARCH");
 ```
 
 ### Using Localized Strings
 ```cpp
 // Use in gadgets
-button *okBtn = new button(gadgets, &MyWindow::fok, okText);
-button *cancelBtn = new button(gadgets, &MyWindow::fcancel, cancelText);
+new cstring(g, NULL, local, NULL, FALSE, PLACETEXT_IN|NG_HIGHLABEL);
+new fbutton(g, WFUNC(&MyWindow::fnew), newentry, FALSE);
 
-// Use in text output
-otext(10, 10, okText);
+// Use in window titles
+sprintf(titre, "MyApp - %s: %s", process.string, proc->pr_Task.tc_Node.ln_Name);
+```
+
+### Catalog File Structure
+The catalog system uses `.catalog` files with specific format:
+- Contains localized strings for different languages
+- Supports multiple languages (English, French, German, Spanish, etc.)
+- Uses CatComp format for compatibility
+
+## Advanced Features
+
+### String Request Dialogs
+```cpp
+#include "stringreq.h"
+
+// Create a string request dialog
+STRPTR StringRequest(STRPTR title, STRPTR def) {
+    STRPTR retstr = NULL;
+    rstring rs(120, 20, 400, 70);
+    
+    rs.def = def;
+    rs.titre = title;
+    rs.open(ns);
+    rs.eventloop();
+    rs.close();
+    
+    if (rs.okflag) {
+        retstr = new char[strlen(rs.sname)+1];
+        strcpy(retstr, rs.sname);
+    }
+    return retstr;
+}
+
+// Use the dialog
+STRPTR name = StringRequest("Enter Name:", "");
+if (name) {
+    // Process the input
+    delete name;
+}
+```
+
+### File Operations with ASL
+```cpp
+#include <proto/asl.h>
+
+// File requester setup
+BOOL OpenAsl(void) {
+    AslBase = OpenLibrary((UBYTE *)"asl.library", 0);
+    return (AslBase) ? TRUE : FALSE;
+}
+
+FileRequester *InitAslFileReq(screen *s, STRPTR drawer, STRPTR title) {
+    FileRequester *fr = NULL;
+    
+    if (OpenAsl()) {
+        fr = (FileRequester *)AllocAslRequestTags(ASL_FileRequest,
+            ASLFR_Screen,           s->scr,
+            ASLFR_RejectIcons,      TRUE,
+            ASLFR_TitleText,        title,
+            ASLFR_InitialDrawer,    drawer,
+            TAG_DONE);
+    }
+    return fr;
+}
+
+// File selection
+BOOL getfile(screen *s, STRPTR name, STRPTR drawer, STRPTR pat, STRPTR title, BOOL savemode) {
+    FileRequester *fr;
+    BOOL retval = FALSE;
+    
+    if (fr = InitAslFileReq(s, drawer, title)) {
+        if (AslRequestTags(fr,
+            ASLFR_InitialFile,      name,
+            ASLFR_InitialPattern,   pat,
+            ASLFR_DoSaveMode,       savemode,
+            ASLFR_DoPatterns,       TRUE,
+            TAG_DONE)) {
+            strcpy(name, fr->fr_File);
+            strcpy(drawer, fr->fr_Drawer);
+            retval = TRUE;
+        }
+        FreeAslRequest(fr);
+        CloseAsl();
+    }
+    return retval;
+}
+```
+
+### AmigaGuide Integration
+```cpp
+#include <proto/amigaguide.h>
+
+// Global variables
+Library *AmigaGuideBase;
+AMIGAGUIDECONTEXT HelpHandle;
+ULONG asig;
+NewAmigaGuide nag = {NULL};
+char basename[80];
+
+// Initialize AmigaGuide
+if (AmigaGuideBase) {
+    sprintf(basename, "MyApp.guide");
+    nag.nag_Name = basename;
+    nag.nag_Node = "MAIN";
+    nag.nag_Line = 0;
+    nag.nag_PubScreen = NULL;
+    CacheClearU();
+    if (HelpHandle = OpenAmigaGuideAsync(&nag, NULL)) {
+        asig = AmigaGuideSignal(HelpHandle);
+    }
+}
+
+// Open help
+void fhelp(gadget *g, ULONG classe, USHORT code) {
+    if (AmigaGuideBase && HelpHandle)
+        SendAmigaGuideCmd(HelpHandle, "LINK MAIN", NULL);
+}
+```
+
+### Window Zoom Support
+```cpp
+// Define zoom dimensions
+WORD winZoom[4] = { 10, 10, 200, 11 };
+
+// In window open method
+winZoom[2] = g->ltext(titre) + 120;  // Calculate width
+winZoom[3] = ns->winbarheight;       // Height
+
+// Add to window tags
+_open(NULL, SCROLLERIDCMP|ARROWIDCMP|STRINGIDCMP|BUTTONIDCMP|
+            IDCMP_VANILLAKEY|IDCMP_MOUSEBUTTONS|IDCMP_CLOSEWINDOW,
+    WA_Title,           titre,
+    WA_Gadgets,         g->glist,
+    WA_DragBar,         TRUE,
+    WA_DepthGadget,     TRUE,
+    WA_CloseGadget,     TRUE,
+    WA_Activate,        TRUE,
+    WA_Zoom,            winZoom,
+    TAG_DONE);
+```
+
+### Dynamic Layout Calculation
+```cpp
+// Calculate layout based on screen dimensions
+long mw = ws->scr->Width - 40;
+long nl = (ws->scr->Height - 
+          (ws->winbarheight + ws->scr->WBorBottom + 
+          (Tiny.tta_YSize*3/2 + 8) * 3 + 
+          12 * 3 + 
+          Normal.tta_YSize*3/2 + 
+          + 8)) / 
+         (3*Tiny.tta_YSize);
+
+// Use calculated values for gadget positioning
+g->box(20, g->maxh+4, mw, g->fontheight*nl+4);
 ```
 
 ## Complete Example
 
-Here's a complete working example:
+Here's a simplified example based on the EnvManager structure:
 
 ```cpp
+// main.cc - Main application file
 #include <exec/types.h>
-#include <exec/execbase.h>
-#include <intuition/intuition.h>
+#include <dos/dos.h>
+#include <dos/dosextens.h>
+#include <graphics/gfxbase.h>
+#include <string.h>
+#include <stdio.h>
 
-#include "screen.h"
-#include "window.h"
-#include "gadget.h"
-#include "gadgets/button.h"
-#include "gadgets/string.h"
+#include <proto/exec.h>
+#include <proto/graphics.h>
+#include <proto/dos.h>
+#include <mydebug.h>
+#include <compiler.h>
 
-class SimpleApp : public window {
-private:
-    string *nameField;
-    button *okButton;
-    button *cancelButton;
+#define NO_CLASS_WINDOW_INLINES
+#include <screen.h>
+#include <locale.h>
 
-public:
-    SimpleApp() : window(100, 100, 300, 150) {
-        // Constructor - window not open yet
-    }
-    
-    virtual ~SimpleApp() {
-        // Destructor
-    }
-    
-    virtual void open(screen *s) {
-        window::open(s);
-        setupGadgets();
-    }
-    
-private:
-    void setupGadgets() {
-        // Create gadget list
-        g = new gadgetlist(3);
-        
-        // Create gadgets
-        nameField = new string(g, 100, 20, "Enter your name");
-        okButton = new button(g, &SimpleApp::fok, "OK");
-        cancelButton = new button(g, &SimpleApp::fcancel, "Cancel");
-    }
-    
-    virtual void fok(gadget *g, unsigned long classe, unsigned short code) {
-        // OK button pressed
-        okflag = TRUE;
-        active = FALSE;
-    }
-    
-    virtual void fcancel(gadget *g, unsigned long classe, unsigned short code) {
-        // Cancel button pressed
-        okflag = FALSE;
-        active = FALSE;
-    }
-};
+#include "myapp.h"
+
+// Global variables
+screen *ns;
+catalog *ecat;
+
+// Library initialization
+void _STI_200_initlibs() {
+    LocaleBase = OpenLibrary((UBYTE *)"locale.library", 0);
+}
+
+void _STD_200_closelibs() {
+    if (LocaleBase) CloseLibrary(LocaleBase);
+}
+
+extern "C" {
+void _STI_4500_initcat() {
+    ecat = new catalog("myapp.catalog", "english", NULL);
+}
+
+void _STD_4500_closecat() {
+    delete ecat;
+}
+}
 
 int main() {
     // Create screen
-    screen *myScreen = new screen(NULL, "Workbench");
-    
-    if (!myScreen->status) {
-        // Screen creation failed
-        return 1;
-    }
-    
-    // Create and open window
-    SimpleApp *app = new SimpleApp();
-    app->open(myScreen);
-    
-    if (!app->initok) {
-        // Window creation failed
+    ns = new screen(NULL, "Workbench");
+    if (ns && ns->status) {
+        // Create and open main window
+        MyApp *app = new MyApp(10, 10, 400, 200);
+        app->open(ns);
+        if (app->initok) {
+            app->eventloop();
+            app->close();
+        }
         delete app;
-        delete myScreen;
-        return 1;
     }
-    
-    // Run event loop
-    app->eventloop();
-    
-    // Cleanup
-    delete app;
-    delete myScreen;
-    
+    delete ns;
     return 0;
+}
+
+#if defined( __GNUG__ )
+ADD2INIT(_STI_4500_initcat, -40);
+ADD2EXIT(_STD_4500_closecat,-40);
+#endif
+```
+
+```cpp
+// myapp.h - Application header
+#ifndef MYAPP_H
+#define MYAPP_H
+
+#include <window.h>
+#include <gadgetlist.h>
+#include <gadgets/fbutton.h>
+#include <gadgets/string.h>
+#include <gadgets/cstring.h>
+#include <locale.h>
+
+// Localized strings
+IMPORT catalog *ecat;
+GLOBAL const lstring FAR okText LPARMS(ecat, "OK", "MSG_OK");
+GLOBAL const lstring FAR cancelText LPARMS(ecat, "Cancel", "MSG_CANCEL");
+GLOBAL const lstring FAR nameLabel LPARMS(ecat, "Name:", "MSG_NAME");
+
+class MyApp : public window {
+private:
+    string *nameField;
+    fbutton *okButton;
+    fbutton *cancelButton;
+
+public:
+    MyApp(short l, short t, short w, short h) : window(l,t,w,h) {}
+    virtual ~MyApp() {}
+    
+    virtual void open(screen *ns);
+    virtual void handlevkey(USHORT code);
+    
+private:
+    void fok(gadget *g, ULONG classe, USHORT code);
+    void fcancel(gadget *g, ULONG classe, USHORT code);
+};
+
+#endif
+```
+
+```cpp
+// myapp.cc - Application implementation
+#include "myapp.h"
+
+void MyApp::open(screen *ns) {
+    ws = ns;
+    g = new gadgetlist(this, 4);
+    
+    // Position gadgets
+    g->box(20, ws->winbarheight+20, g->ltext(nameLabel)+8, g->fontheight+4);
+    new cstring(g, NULL, nameLabel, NULL, FALSE, PLACETEXT_IN);
+    
+    g->box(20, g->maxh+8, 200, g->fontheight+4);
+    nameField = new string(g, NULL, NULL, "Enter your name", 50);
+    
+    g->box(20, g->maxh+20, g->ltext(okText)+8, g->fontheight+4);
+    okButton = new fbutton(g, WFUNC(&MyApp::fok), okText, FALSE);
+    
+    g->box(100, g->maxh+20, g->ltext(cancelText)+8, g->fontheight+4);
+    cancelButton = new fbutton(g, WFUNC(&MyApp::fcancel), cancelText, FALSE);
+    
+    // Open window
+    prepbox(TRUE);
+    _open(NULL, BUTTONIDCMP|IDCMP_VANILLAKEY|IDCMP_CLOSEWINDOW,
+        WA_Title,           "My OUI Application",
+        WA_Gadgets,         g->glist,
+        WA_DragBar,         TRUE,
+        WA_CloseGadget,     TRUE,
+        WA_Activate,        TRUE,
+        TAG_DONE);
+    
+    if (initok) g->updategadgets();
+}
+
+void MyApp::handlevkey(USHORT code) {
+    if (code == 0x0D) {  // Enter
+        g->selectgadget(okButton->id, FALSE);
+    }
+    else if (code == 0x1B) {  // Escape
+        g->selectgadget(cancelButton->id, FALSE);
+    }
+    else {
+        g->parsegadgets(code);
+    }
+}
+
+void MyApp::fok(gadget *g, ULONG classe, USHORT code) {
+    // Process the name field
+    printf("Name entered: %s\n", nameField->curstring);
+    okflag = TRUE;
+    active = FALSE;
+}
+
+void MyApp::fcancel(gadget *g, ULONG classe, USHORT code) {
+    okflag = FALSE;
+    active = FALSE;
 }
 ```
 
@@ -467,31 +765,70 @@ int main() {
 
 ### SMakefile Example
 ```makefile
-TARGET = MyApp
-OBJS = main.o
+# Makefile for OUI application
+OBJS= main.o myapp.o
+LIBS= LIB:debug.lib ULIB:oui.lib LIB:scm.lib\
+       LIB:sc.lib LIB:amiga.lib
 
-CC = sc
-LINK = slink
-CFLAGS = -Iinclude: -Iinclude:OUI -Iinclude:OUI/gadgets
-LDFLAGS = -Llib: -lOUI -lsc -lsmall
+.cc.o:
+    sc $< srcis=$>.cc
 
-$(TARGET): $(OBJS)
-	$(LINK) $(OBJS) -o $(TARGET) $(LDFLAGS)
+myapp: $(OBJS) ULIB:oui.lib
+    slink with <<
+    LIB:c.o
+    $(OBJS)
+    LIB $(LIBS)
+    SMALLCODE
+    SMALLDATA
+    STRIPDEBUG
+    BATCH
+    VERBOSE
+    NOICONS
+    DEFINE @__chkabort=@__dummy
+    DEFINE __CXM33=__UCXM33
+    DEFINE __CXD33=__UCXD33
+    DEFINE __CXM22=__UCXM22
+    DEFINE __CXD22=__UCXD22
+<
 
-.c.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+# Dependencies
+main.o: main.cc myapp.h
+myapp.o: myapp.cc myapp.h
+```
+
+### GNU Makefile Example
+```makefile
+O = ./GNU/mc68000/
+CXXFLAGS = -noixemul
+CPPFLAGS = -I ../oui/include/
+OBJS= $(O)main.o $(O)myapp.o
+
+myapp: $(OBJS)
+	g++ -noixemul -o myapp $(OBJS) -loui -ldebug
+
+$(O)main.o: main.cc myapp.h
+$(O)myapp.o: myapp.cc myapp.h
 ```
 
 ### Compilation Steps
 1. **Include paths**: Add `OUI/include` and `OUI/include/gadgets` to your include path
 2. **Link libraries**: Link against `oui.lib` and standard Amiga libraries
 3. **Compiler**: Use SAS/C or GCC with appropriate flags
+4. **Library initialization**: Use `ADD2INIT` and `ADD2EXIT` macros for GCC
 
 ### Required Libraries
-- `oui.lib` - OUI library
-- `sc.lib` - SAS/C library
-- `small.lib` - Small library
+- `oui.lib` - OUI library (in ULIB:)
+- `debug.lib` - Debug library (in LIB:)
+- `scm.lib` - SAS/C math library (in LIB:)
+- `sc.lib` - SAS/C library (in LIB:)
+- `amiga.lib` - Amiga library (in LIB:)
 - Standard Amiga libraries (exec, intuition, gadtools, etc.)
+
+### Compiler-Specific Notes
+- **SAS/C**: Use `sc` compiler with `srcis=` parameter
+- **GCC**: Use `g++` with `-noixemul` flag
+- **Library initialization**: Required for proper OUI memory management
+- **Debug builds**: Include `debug.lib` for debugging support
 
 ## Tips and Best Practices
 

@@ -1,0 +1,25 @@
+00000 L_ocal
+00001 G_lobal
+00002 A_rchive
+00003 Local Size
+00004 Global Size
+00005 New Entry
+00006 Process
+00050 New Var:
+00051 UnNamed
+00052 Nothing
+00100 Alias
+00101 Local
+00102 Global
+00103 Archived
+00104 Binary
+00105 Null Term
+00106 Size
+00107 _Contents
+00108 _Name
+00109 _Edit
+00110 _Import
+00111 _Export
+00112 Edition
+00200 Import from:
+00201 Export to:

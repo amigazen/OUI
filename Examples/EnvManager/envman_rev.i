@@ -1,0 +1,14 @@
+VERSION		EQU	1
+REVISION	EQU	1
+DATE	MACRO
+		dc.b	'10.9.96'
+	ENDM
+VERS	MACRO
+		dc.b	'envman 1.1'
+	ENDM
+VSTRING	MACRO
+		dc.b	'envman 1.1 (10.9.96)',13,10,0
+	ENDM
+VERSTAG	MACRO
+		dc.b	0,'$VER: envman 1.1 (10.9.96)',0
+	ENDM

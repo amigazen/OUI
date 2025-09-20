@@ -1,0 +1,26 @@
+00000 L_ocalo
+00001 G_lobalo
+00002 _Archivio
+00003 Dimensione Locale
+00004 Dimensione Globale
+00005 Creazione/Ricerca
+00006 Processo
+00050 Cercare/Creare
+00051 SenzaNome
+00052 Niente
+00100 Alias
+00101 Localo
+00102 Globalo
+00103 Archivio
+00104 Binario
+00105 Null Fine
+00106 Dimensione
+00107 _Data
+00108 Data
+00109 _Nome
+00110 _Edizione
+00111 _Importare
+00112 _Exportare
+00113 Edizione
+00200 Importare di :
+00201 Exportare come :
