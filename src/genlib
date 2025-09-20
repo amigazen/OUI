@@ -11,6 +11,6 @@ Rename locale2.o as locale.o
 oml oui_localise.lib A locale.o
 Rename locale.o locale2.o
 Rename locale_temp.o locale.o
-Copy oui.lib to ULib:
-Copy oui_localise.lib to ULib:
+Copy oui.lib to //SDK/lib/
+Copy oui_localise.lib to //SDK/lib/
 

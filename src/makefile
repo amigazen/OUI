@@ -19,8 +19,8 @@ OBJS =  $(O)new.o $(O)screen.o $(O)gadgetlist.o $(O)gadget.o $(O)rectangle.o\
 $(OUILIB): $(OBJS) $(O)locale.o $(O)locale2.o $(O)window.o $(O)window2.o
     Join $(OBJS) $(O)locale.o $(O)window.o AS $(OUILIB)
     Join $(OBJS) $(O)locale2.o $(O)window2.o AS $(OUILOCALISELIB)
-    Copy $(OUILIB) TO ULib:
-    Copy $(OUILOCALISELIB) TO ULib:
+    Copy $(OUILIB) TO //SDK/lib/
+    Copy $(OUILOCALISELIB) TO //SDK/lib/
 
 
 $(O)eprop.o: eprop.cc $(IG)/eprop.h $(IG)/eclass.h $(I)/gadgetlist.h \
